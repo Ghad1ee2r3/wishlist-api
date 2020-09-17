@@ -5,6 +5,11 @@ from items.models import Item,FavoriteItem
 
 
 
+class UserSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = User
+		fields = ['first_name', 'last_name']
+
 
 class RegisterSerializer(serializers.ModelSerializer):
 	password = serializers.CharField(write_only=True)
@@ -24,44 +29,29 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 
 
-class UserSerializer(serializers.ModelSerializer):
-	class Meta:
-		model = User
-		fields = ['first_name', 'last_name']
-
-
 
 class ItemListSerializer(serializers.ModelSerializer):
-	added_by=UserSerializer()
-	favourited=serializers.SerializerMethodField()
-	detail = serializers.HyperlinkedIdentityField(
-		view_name = "api-detail",
-		lookup_field = "id",
-		lookup_url_kwarg = "item_id"
-		)
-
-	class Meta:
-		model = Item
-		fields = ['detail' , 'description', 'name', 'image' , 'added_by','favourited']
-
-	def get_favourited(self,obj):
-		ob=FavoriteItem.objects.filter(id=obj.id)
-		count=ob.count()
-		return count
-
-# class FavoriteItemSerializer(serializers.ModelSerializer):
-# 	user=UserSerializer()
-# 	class Meta:
-# 		model = FavoriteItem
-# 		fields=['id','user']
+    detail = serializers.HyperlinkedIdentityField(
+        view_name = "api-detail",
+        lookup_field = "id",
+        lookup_url_kwarg = "item_id"
+        )
+    added_by = UserSerializer()
+    favourited = serializers.SerializerMethodField()
+    class Meta:
+        model = Item
+        fields = ['image', 'name', 'added_by', 'detail','favourited']
+    def get_favourited(self, obj):
+        count = len(FavoriteItem.objects.filter(id = obj.id))
+        return count
 
 
 class ItemDetailSerializer(serializers.ModelSerializer):
-	favourited_by=serializers.SerializerMethodField()
-	class Meta:
-		model = Item
-		fields = ['description', 'name', 'image' , 'added_by','favourited_by']
+    favourited_by = serializers.SerializerMethodField()
 
-	def get_favourited_by(self,obj):
-		us=FavoriteItem.objects.filter(id=obj.id)
-		return 	UserSerializer(us,many=True).data
+    class Meta:
+        model = Item
+        fields = '__all__'
+    def get_favourited_by(self, obj):
+        us = FavoriteItem.objects.filter(id = obj.id)
+        return UserSerializer(us, many=True).data
