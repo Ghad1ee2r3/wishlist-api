@@ -31,11 +31,12 @@ urlpatterns = [
     path('items/list/', views.item_list, name='item-list'),
     path('items/detail/<int:item_id>/', views.item_detail, name='item-detail'),
     path('items/wishlist/', views.wishlist, name='wishlist' ),
-    path('items/list/', api_views.ItemListView.as_view(), name='api-list'),
-    path('items/detail/', api_views.ItemDetailView.as_view(), name='api-detail'),
+    path('api/list/', api_views.ItemListView.as_view(), name='api-list'),
+    path('api/detail/<int:item_id>', api_views.ItemDetailView.as_view(), name='api-detail'),
+    path('api/register/', api_views.Register.as_view(), name='api-register'),
 
 
- path('login/', TokenObtainPairView.as_view(), name='api-login'),
+    path('login/', TokenObtainPairView.as_view(), name='api-login'),
     path('api/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
 
